@@ -1,9 +1,13 @@
 package com.example.merchapp.api;
 
+import com.example.merchapp.model.LoginRequest;
+import com.example.merchapp.model.LoginResponse;
 import com.example.merchapp.model.Report;
 import com.example.merchapp.model.Schedule;
 import com.example.merchapp.model.Task;
+
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -11,81 +15,77 @@ import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface ApiService {
-    @POST("api/auth/signin")
-    Call<LoginResponse> signin(@Body LoginRequest request);
+    @GET("tasks") // Убедитесь, что это правильный путь к API
+    Call<List<Task>> getTasks(@Header("Authorization") String authHeader);
+    @POST("reports/submit") // Убедитесь, что это правильный путь к API
+    Call<Void> submitReport(@Header("Authorization") String authHeader, @Body ReportRequest reportRequest);
 
-    @GET("api/tasks")
-    Call<List<Task>> getTasks(@Header("Authorization") String token);
+    @GET("schedules") // Убедитесь, что это правильный путь к API
+    Call<List<Schedule>> getSchedules(@Header("Authorization") String authHeader);
+    // Метод для получения отчетов
+    @GET("reports") // Замените на реальный путь API для отчетов
+    Call<List<Report>> getReports(@Header("Authorization") String authHeader);
 
-    @GET("api/schedules")
-    Call<List<Schedule>> getSchedules(@Header("Authorization") String token);
+    // Метод для логина
+    @POST("login")
+    Call<LoginResponse> login(@Body LoginRequest loginRequest);
 
-    @GET("api/reports")
-    Call<List<Report>> getReports(@Header("Authorization") String token);
+    // Вложенный класс ReportRequest, если он используется внутри ApiService
+    public static class ReportRequest {
+        private Long taskId;
+        private int cashRegisterCount;
+        private String comment;
+        private String cashPhotoUrl;
+        private String zonePhotoUrl;
 
-    @POST("api/reports")
-    Call<Void> submitReport(@Header("Authorization") String token, @Body ReportRequest report);
-
-    @POST("api/upload")
-    Call<UploadResponse> uploadPhoto(@Header("Authorization") String token, @Body UploadRequest request);
-
-    class LoginRequest {
-        public String username;
-        public String password;
-
-        public LoginRequest(String username, String password) {
-            this.username = username;
-            this.password = password;
-        }
-    }
-
-    class LoginResponse {
-        public String token;
-        public String type;
-        public Long id;
-        public String username;
-        public String email;
-        public List<String> roles;
-
-        public LoginResponse(String token, String type, Long id, String username, String email, List<String> roles) {
-            this.token = token;
-            this.type = type;
-            this.id = id;
-            this.username = username;
-            this.email = email;
-            this.roles = roles;
-        }
-    }
-
-    class ReportRequest {
-        public Long taskId;
-        public int cashRegisterCount;
-        public String comment;
-        public String cashRegisterPhotoUrl;
-        public String mainZonePhotoUrl;
-
-        public ReportRequest(Long taskId, int cashRegisterCount, String comment, String cashRegisterPhotoUrl, String mainZonePhotoUrl) {
+        // Конструктор
+        public ReportRequest(Long taskId, int cashRegisterCount, String comment, String cashPhotoUrl, String zonePhotoUrl) {
             this.taskId = taskId;
             this.cashRegisterCount = cashRegisterCount;
             this.comment = comment;
-            this.cashRegisterPhotoUrl = cashRegisterPhotoUrl;
-            this.mainZonePhotoUrl = mainZonePhotoUrl;
+            this.cashPhotoUrl = cashPhotoUrl;
+            this.zonePhotoUrl = zonePhotoUrl;
         }
-    }
 
-    class UploadRequest {
-        public String file;
-
-        public UploadRequest(String file) {
-            this.file = file;
+        // Геттеры и сеттеры
+        public Long getTaskId() {
+            return taskId;
         }
-    }
 
-    class UploadResponse {
-        public String url;
+        public void setTaskId(Long taskId) {
+            this.taskId = taskId;
+        }
 
-        public UploadResponse(String url) {
-            this.url = url;
+        public int getCashRegisterCount() {
+            return cashRegisterCount;
+        }
+
+        public void setCashRegisterCount(int cashRegisterCount) {
+            this.cashRegisterCount = cashRegisterCount;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public String getCashPhotoUrl() {
+            return cashPhotoUrl;
+        }
+
+        public void setCashPhotoUrl(String cashPhotoUrl) {
+            this.cashPhotoUrl = cashPhotoUrl;
+        }
+
+        public String getZonePhotoUrl() {
+            return zonePhotoUrl;
+        }
+
+        public void setZonePhotoUrl(String zonePhotoUrl) {
+            this.zonePhotoUrl = zonePhotoUrl;
         }
     }
 }

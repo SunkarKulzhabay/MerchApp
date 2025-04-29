@@ -22,8 +22,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import java.util.List;
 
-import static android.content.Context.RECEIVER_NOT_EXPORTED;
-
 public class TaskListActivity extends AppCompatActivity {
     private RecyclerView taskRecyclerView;
     private TaskAdapter taskAdapter;
@@ -48,17 +46,20 @@ public class TaskListActivity extends AppCompatActivity {
         );
         taskRecyclerView.setAdapter(taskAdapter);
 
+        // Register receiver to update tasks
         taskUpdateReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 loadTasks();
             }
         };
-        registerReceiver(taskUpdateReceiver, new IntentFilter("com.example.merchapp.TASK_UPDATED"), RECEIVER_NOT_EXPORTED);
+        registerReceiver(taskUpdateReceiver, new IntentFilter("com.example.merchapp.TASK_UPDATED"));
 
+        // Start syncing service
         Intent serviceIntent = new Intent(this, TaskSyncService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
 
+        // Load tasks
         loadTasks();
     }
 

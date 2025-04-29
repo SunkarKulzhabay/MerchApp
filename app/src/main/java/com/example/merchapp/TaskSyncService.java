@@ -20,6 +20,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
+import androidx.core.app.NotificationCompat;
+import com.example.merchapp.api.ApiClient;
+import com.example.merchapp.model.Task;
+import com.example.merchapp.utils.AuthManager;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class TaskSyncService extends Service {
     private static final String CHANNEL_ID = "TaskSyncChannel";
     private static final int NOTIFICATION_ID = 1;
@@ -38,6 +56,7 @@ public class TaskSyncService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // Создаем уведомление для работы в фоновом режиме
         Notification notification = createNotification();
         startForeground(NOTIFICATION_ID, notification);
 
@@ -45,7 +64,7 @@ public class TaskSyncService extends Service {
             @Override
             public void run() {
                 checkForNewTasks();
-                handler.postDelayed(this, 60000);
+                handler.postDelayed(this, 60000); // Проверяем задачи каждую минуту
             }
         };
         handler.post(taskCheckRunnable);
@@ -71,13 +90,14 @@ public class TaskSyncService extends Service {
 
             @Override
             public void onFailure(Call<List<Task>> call, Throwable t) {
+                // Обработать ошибку
             }
         });
     }
 
     private void sendNewTaskNotification(int newTaskCount) {
         Intent intent = new Intent(this, TaskListActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("New Tasks Available")
@@ -88,12 +108,14 @@ public class TaskSyncService extends Service {
                 .build();
 
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(NOTIFICATION_ID + 1, notification);
+        if (manager != null) {
+            manager.notify(NOTIFICATION_ID + 1, notification); // Различный ID для избегания конфликтов
+        }
     }
 
     private Notification createNotification() {
         Intent intent = new Intent(this, TaskListActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Task Sync Service")
@@ -111,7 +133,9 @@ public class TaskSyncService extends Service {
                     NotificationManager.IMPORTANCE_LOW
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+            if (manager != null) {
+                manager.createNotificationChannel(channel);
+            }
         }
     }
 

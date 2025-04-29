@@ -1,15 +1,16 @@
 plugins {
     alias(libs.plugins.android.application)
 }
+apply plugin: 'com.android.application'
 
 android {
+    compileSdkVersion 34
     namespace 'com.example.merchapp'
-    compileSdk 35
 
     defaultConfig {
         applicationId "com.example.merchapp"
-        minSdk 35
-        targetSdk 35
+        minSdkVersion 26
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -22,23 +23,28 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    packagingOptions {
+        exclude '/META-INF/INDEX.LIST'
+        exclude '/META-INF/DEPENDENCIES'
+        exclude '/META-INF/io.netty.versions.properties'
+        exclude '/META-INF/LICENSE'
+        exclude '/META-INF/LICENSE.txt'
+        exclude '/META-INF/license.txt'
+        exclude '/META-INF/NOTICE'
+        exclude '/META-INF/NOTICE.txt'
+        exclude '/META-INF/notice.txt'
+        exclude '/META-INF/ASL2.0'
+        pickFirst 'META-INF/*.kotlin_module'
+    }
 }
 
 dependencies {
-
-
-    implementation libs.appcompat
-    implementation libs.material
-    implementation libs.activity
-    implementation libs.constraintlayout
-    implementation libs.firebase.appdistribution.gradle
-    testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
-    androidTestImplementation libs.espresso.core
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core:1.12.0'
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
@@ -48,4 +54,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
     implementation 'androidx.activity:activity:1.9.2'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
